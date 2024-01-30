@@ -1,23 +1,20 @@
 #include "rtpghi.h"
+
 #include "rtpghi_p.h"
 
-rtpghi::rtpghi(int W, int a, int M, double tol)
-{
-    assert(W > 0, "W must be positive");
-    assert(a > 0, "a must be positive");
-    assert(M > 0, "M must be positive");
-    assert(tol > 0 && tol < 1, "tol must be in range ]0,1[");
-
+rtpghi_t::rtpghi_t(int W, int a, int M, double tol) {
     _p = new rtpghi_priv(W, a, M, tol);
 }
 
-double rtpghi::get_stretch() const
-{
-    return _p->get_stretch();
-}
+rtpghi_t::~rtpghi_t() { delete _p; }
 
-void rtpghi::set_tolerance(double tol)
-{
-    assert(tol > 0 && tol < 1, "tol must be in range ]0,1[");
-    _p->set_tolerance(tol);
+void rtpghi_t::reset(const double** sinit) { _p->reset(sinit); }
+
+double rtpghi_t::get_stretch() const { return _p->get_stretch(); }
+
+void rtpghi_t::set_tolerance(double tol) { _p->set_tolerance(tol); }
+
+void rtpghi_t::execute(const std::complex<double>* s, double stretch,
+                       std::complex<double>* c) {
+    _p->execute(s, stretch, c);
 }
