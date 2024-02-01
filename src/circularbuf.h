@@ -1,8 +1,7 @@
 #ifndef CIRCULAR_BUF_H__
 #define CIRCULAR_BUF_H__
 
-class analysis_fifo_priv;
-class synthesis_fifo_priv;
+#include <memory>
 
 class analysis_fifo_t final {
    public:
@@ -27,11 +26,11 @@ class analysis_fifo_t final {
     analysis_fifo_t(int fifoLen, int procDelay, int winLen, int hop,
                     int numChans);
 
-    ~analysis_fifo_t();
+    int get_numchans() const;
 
     void reset();
     void set_hop(int hop);
-    void set_read_chan_stride(int stride);
+    void set_readchanstride(int stride);
 
     /** Write bufLen samples to the analysis ring buffer
      *
@@ -65,7 +64,14 @@ class analysis_fifo_t final {
     int read(double buf[]);
 
    private:
-    analysis_fifo_priv *_p;
+    int                       _winLen;          //!< Window length
+    int                       _readchanstride;  //!< Window length
+    int                       _hop;             //!< Hop size
+    std::unique_ptr<double[]> _buf;             //!< Ring buffer array
+    int                       _bufLen;          //!< Length of the previous
+    int                       _readIdx;         //!< Read pos.
+    int                       _writeIdx;        //!< Write pos.
+    int                       _numChans;
 };
 
 class synthesis_fifo_t final {
@@ -93,11 +99,11 @@ class synthesis_fifo_t final {
      */
     synthesis_fifo_t(int fifoLen, int winLen, int hop, int numChans);
 
-    ~synthesis_fifo_t();
+    int get_numchans() const;
 
     void reset();
     void set_hop(int hop);
-    void set_write_chan_stride(int stride);
+    void set_writechanstride(int stride);
 
     /** Write p->winLen samples to DGT synthesis ring buffer
      *
@@ -126,7 +132,14 @@ class synthesis_fifo_t final {
     int read(int bufLen, int W, double *buf[]);
 
    private:
-    synthesis_fifo_priv *_p;
+    int                       _winLen;           //!< Window length
+    int                       _writechanstride;  //!< Window length
+    int                       _hop;              //!< Hop size
+    std::unique_ptr<double[]> _buf;              //!< Ring buffer array
+    int                       _bufLen;           //!< Length of the previous
+    int                       _readIdx;          //!< Read pos.
+    int                       _writeIdx;         //!< Write pos.
+    int                       _numChans;
 };
 
 #endif  // CIRCULAR_BUF_H__

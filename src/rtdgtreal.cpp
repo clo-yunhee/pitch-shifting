@@ -2,7 +2,8 @@
 
 #include "rtdgtreal_p.h"
 
-rtdgtreal_t::rtdgtreal_t(const double *g, int gl, int M, rtdgt_phase_t ptype) {
+rtdgtreal_t::rtdgtreal_t(const double *g, int gl, int M, rtdgt_phase_t ptype)
+    : M(M) {
     _p = new rtdgtreal_priv(g, gl, M, ptype, DGT_FORWARD);
 }
 
@@ -12,8 +13,8 @@ void rtdgtreal_t::execute(const double *f, int W, std::complex<double> *c) {
     _p->execute_fwd(f, W, c);
 }
 
-rtidgtreal_t::rtidgtreal_t(const double *g, int gl, int M,
-                           rtdgt_phase_t ptype) {
+rtidgtreal_t::rtidgtreal_t(const double *g, int gl, int M, rtdgt_phase_t ptype)
+    : M(M) {
     _p = new rtdgtreal_priv(g, gl, M, ptype, DGT_INVERSE);
 }
 

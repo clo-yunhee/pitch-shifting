@@ -5,10 +5,15 @@
 
 #include "rtdgtreal.h"
 
+enum dgt_transformdirection_t {
+    DGT_FORWARD,
+    DGT_INVERSE,
+};
+
 class rtdgtreal_priv final {
    public:
     rtdgtreal_priv(const double *g, int gl, int M, const rtdgt_phase_t ptype,
-                   const dgt_transformdirection tradir);
+                   const dgt_transformdirection_t tradir);
 
     ~rtdgtreal_priv();
 

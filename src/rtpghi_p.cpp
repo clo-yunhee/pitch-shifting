@@ -1,11 +1,14 @@
+#define _USE_MATH_DEFINES
 #include "rtpghi_p.h"
 
 #include <algorithm>
+#include <cmath>
 #include <complex>
 #include <cstdio>
 
 #include "rtpghi.h"
 #include "rtpghi_heap.h"
+
 
 static double princarg(double in) {
     return (in - 2.0 * M_PI * std::round(in / (2.0 * M_PI)));
@@ -101,8 +104,7 @@ void rtpghi_priv::execute(const std::complex<double> *cin, double stretch,
                           std::complex<double> *cout) {
     // n, n-1, n-2 frames
     // s is n-th
-    int    M2, W, asyn, aanaprev, aananext;
-    double stretchmid;
+    int M2, W, asyn, aanaprev, aananext;
 
     M2 = _M / 2 + 1;
     W = _W;

@@ -31,13 +31,31 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(FFTW REQUIRED fftw3 IMPORTED_TARGET)
 
 add_library(rtpghi SHARED
-    src/circularbuf_p.cpp
+    include/firwin.h
+    include/pv.h
+    include/rtdgtreal.h
+    include/rtdgtrealproc.h
+    include/rtpghi.h
+    src/arrayutils.cpp
+    src/arrayutils.h
     src/circularbuf.cpp
+    src/circularbuf.h
+    src/firwin.cpp
+    src/gabdual_painless.cpp
+    src/gabdual_painless.h
+    src/pv_p.cpp
+    src/pv_p.h
     src/pv.cpp
     src/rtdgtreal_p.cpp
+    src/rtdgtreal_p.h
     src/rtdgtreal.cpp
+    src/rtdgtrealproc_p.cpp
+    src/rtdgtrealproc_p.h
+    src/rtdgtrealproc.cpp
     src/rtpghi_heap.cpp
+    src/rtpghi_heap.h
     src/rtpghi_p.cpp
+    src/rtpghi_p.h
     src/rtpghi.cpp)
 
 target_include_directories(rtpghi PUBLIC
@@ -64,3 +82,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set_target_properties(rtpghi PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
     endif()
 endif()
+
+# Test.
+
+add_executable(test tests/main.cpp)
+target_link_libraries(test PRIVATE rtpghi)
