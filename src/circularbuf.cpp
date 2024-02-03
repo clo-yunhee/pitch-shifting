@@ -13,13 +13,14 @@ analysis_fifo_t::analysis_fifo_t(int fifoLen, int procDelay, int winLen,
     rtpghi_assert(fifoLen > winLen + 1,
                   "fifoLen must be greater than winLen+1");
 
+    _winLen = winLen;
+    _readchanstride = winLen;
+    _hop = hop;
     _buf = std::make_unique<double[]>(numChans * (fifoLen + 1));
     _bufLen = fifoLen + 1;
-    _hop = hop;
-    _winLen = winLen;
     _readIdx = fifoLen + 1 - procDelay;
+    _writeIdx=0;
     _numChans = numChans;
-    _readchanstride = winLen;
 }
 
 int analysis_fifo_t::get_numchans() const { return _numChans; }
@@ -134,12 +135,14 @@ synthesis_fifo_t::synthesis_fifo_t(int fifoLen, int winLen, int hop,
     rtpghi_assert(fifoLen > winLen + 1,
                   "fifoLen must be greater than winLen+1");
 
-    _buf = std::make_unique<double[]>(numChans * (fifoLen + winLen + 1));
-    _hop = hop;
     _winLen = winLen;
-    _numChans = numChans;
-    _bufLen = fifoLen + winLen + 1;
     _writechanstride = winLen;
+    _hop = hop;
+    _buf = std::make_unique<double[]>(numChans * (fifoLen + winLen + 1));
+    _bufLen = fifoLen + winLen + 1;
+    _readIdx=0;
+    _writeIdx=0;
+    _numChans = numChans;
 }
 
 int synthesis_fifo_t::get_numchans() const { return _numChans; }
@@ -208,7 +211,7 @@ int synthesis_fifo_t::read(int bufLen, int W, double** buf) {
     available = _writeIdx - _readIdx;
     if (available < 0) available += _bufLen;
 
-    toRead = available < _bufLen ? available : _bufLen;
+    toRead = available < bufLen ? available : bufLen;
 
     valid = toRead;
     over = 0;
@@ -224,7 +227,7 @@ int synthesis_fifo_t::read(int bufLen, int W, double** buf) {
     // are not used in write again
     if (valid > 0) {
         for (int w = 0; w < W; ++w) {
-            double* pbufchan = _buf.get() + _readIdx + w * _bufLen;
+            double* pbufchan = _buf.get() + _readIdx + w * _bufLen; 
             std::copy(pbufchan, pbufchan + valid, buf[w]);
             std::fill(pbufchan, pbufchan + valid, 0);
         }

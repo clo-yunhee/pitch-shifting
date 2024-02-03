@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 
 #include "rtpghi.h"
 

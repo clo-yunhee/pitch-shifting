@@ -7,6 +7,8 @@ project(
     VERSION 1.0
     LANGUAGES C CXX)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 # Default build type to Debug.
 
 set(default_build_type "Debug")
@@ -29,8 +31,9 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(FFTW REQUIRED fftw3 IMPORTED_TARGET)
+pkg_search_module(sndfile REQUIRED sndfile IMPORTED_TARGET)
 
-add_library(rtpghi SHARED
+add_library(rtpghi STATIC
     include/firwin.h
     include/pv.h
     include/rtdgtreal.h
@@ -86,4 +89,16 @@ endif()
 # Test.
 
 add_executable(test tests/main.cpp)
-target_link_libraries(test PRIVATE rtpghi)
+
+target_link_libraries(test PRIVATE
+    rtpghi
+    PkgConfig::sndfile)
+
+target_include_directories(test PRIVATE
+    PkgConfig::sndfile)
+
+# Enable Sanitizers if debug build.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(rtpghi PUBLIC -fsanitize=address)
+    target_link_options(rtpghi PUBLIC -fsanitize=address)
+endif()
