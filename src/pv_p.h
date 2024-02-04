@@ -10,6 +10,8 @@ class pv_priv final {
    public:
     pv_priv(double stretchmax, int Wmax, int bufLenMax);
 
+    int get_procdelay() const;
+
     void print_pos() const;
 
     size_t next_inlen(size_t Lout) const;
@@ -30,6 +32,7 @@ class pv_priv final {
     std::unique_ptr<rtdgtreal_processor_t> _proc;
     std::unique_ptr<rtpghi_t>              _rtpghi;
     double                                 _stretch;
+    int                                    _procdelay;
     size_t                                 _in_pos;
     size_t                                 _out_pos;
     double                                 _in_in_out_offset;

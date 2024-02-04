@@ -2,7 +2,6 @@
 
 #include <fftw3.h>
 
-#include "arrayutils.h"
 #include "circularbuf.h"
 #include "gabdual_painless.h"
 #include "rtdgtreal.h"

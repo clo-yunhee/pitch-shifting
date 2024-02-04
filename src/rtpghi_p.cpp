@@ -9,7 +9,6 @@
 #include "rtpghi.h"
 #include "rtpghi_heap.h"
 
-
 static double princarg(double in) {
     return (in - 2.0 * M_PI * std::round(in / (2.0 * M_PI)));
 }

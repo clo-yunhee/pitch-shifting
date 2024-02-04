@@ -18,12 +18,18 @@ pv_priv::pv_priv(double stretchmax, int Wmax, int bufLenMax) {
     int M = 8192;
     int gl = 4096;
     int fifoSize = (bufLenMax + asyn) * stretchmax;
-    int procDelay = gl < fifoSize ? fifoSize : gl;
+
+    _procdelay = gl < fifoSize ? fifoSize : gl;
+
+    _in_pos = 0;
+    _out_pos = 0;
+    _in_in_out_offset = 0.0;
+    _out_in_in_offset = 0.0;
 
     _asyn = asyn;
 
     _proc = std::make_unique<rtdgtreal_processor_t>(FIRWIN_HANN, gl, asyn, M,
-                                                    Wmax, fifoSize, procDelay);
+                                                    Wmax, fifoSize, _procdelay);
 
     _rtpghi = std::make_unique<rtpghi_t>(Wmax, asyn, M, 1e-6);
 
@@ -31,6 +37,8 @@ pv_priv::pv_priv(double stretchmax, int Wmax, int bufLenMax) {
 
     set_stretch(1.0);
 }
+
+int pv_priv::get_procdelay() const { return _procdelay; }
 
 void pv_priv::print_pos() const {
     printf(
@@ -47,7 +55,9 @@ size_t pv_priv::next_inlen(size_t Lout) const {
 
 size_t pv_priv::next_outlen(size_t Lin) const {
     double stretch = _rtpghi->get_stretch();
-    size_t out_pos_end = (size_t)std::round(Lin * stretch + _in_in_out_offset);
+    size_t out_pos_end =
+        (size_t)std::round((double)Lin * stretch + _in_in_out_offset);
+    printf("stretch:%f, in_in_out_offset:%f\n", stretch, _in_in_out_offset);
     return out_pos_end;
 }
 
@@ -68,7 +78,7 @@ void pv_priv::set_stretch(double stretch) {
     int    newaana = std::round(_asyn / stretch);
     double truestretch = ((double)_asyn) / newaana;
 
-    if (fabs(truestretch - _stretch) < std::numeric_limits<double>::epsilon()) {
+    if (fabs(truestretch - _stretch) > std::numeric_limits<double>::epsilon()) {
         _aana = newaana;
         _stretch = truestretch;
         _proc->set_anaa(newaana);

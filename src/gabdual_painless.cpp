@@ -1,9 +1,9 @@
 #include "gabdual_painless.h"
 
+#include <memory>
+
 #include "arrayutils.h"
 #include "rtpghi.h"
-
-#include <memory>
 
 void gabframediag(const double *g, int gl, int a, int M, int dl, double *d) {
     std::div_t domod;

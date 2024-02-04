@@ -8,6 +8,8 @@ pv_t::pv_t(double stretchmax, int Wmax, int bufLenMax) {
 
 pv_t::~pv_t() { delete _p; }
 
+int pv_t::get_procdelay() const { return _p->get_procdelay(); }
+
 void pv_t::print_pos() const { _p->print_pos(); }
 
 size_t pv_t::next_inlen(size_t Lout) const { return _p->next_inlen(Lout); }

@@ -18,8 +18,8 @@ analysis_fifo_t::analysis_fifo_t(int fifoLen, int procDelay, int winLen,
     _hop = hop;
     _buf = std::make_unique<double[]>(numChans * (fifoLen + 1));
     _bufLen = fifoLen + 1;
-    _readIdx = fifoLen + 1 - procDelay;
-    _writeIdx=0;
+    _readIdx = fifoLen + 1;  // - procDelay;
+    _writeIdx = 0;
     _numChans = numChans;
 }
 
@@ -109,14 +109,13 @@ int analysis_fifo_t::read(double* buf) {
     if (valid > 0) {
         for (int w = 0; w < _numChans; ++w) {
             double* pbufchan = _buf.get() + w * _bufLen + _readIdx;
-            std::copy(pbufchan, pbufchan + valid,
-                      _buf.get() + w * _readchanstride);
+            std::copy(pbufchan, pbufchan + valid, buf + w * _readchanstride);
         }
     }
     if (over > 0) {
         for (int w = 0; w < _numChans; ++w) {
             std::copy(_buf.get() + w * _bufLen, _buf.get() + w * _bufLen + over,
-                      _buf.get() + valid + w * _readchanstride);
+                      buf + valid + w * _readchanstride);
         }
     }
 
@@ -140,8 +139,8 @@ synthesis_fifo_t::synthesis_fifo_t(int fifoLen, int winLen, int hop,
     _hop = hop;
     _buf = std::make_unique<double[]>(numChans * (fifoLen + winLen + 1));
     _bufLen = fifoLen + winLen + 1;
-    _readIdx=0;
-    _writeIdx=0;
+    _readIdx = 0;
+    _writeIdx = 0;
     _numChans = numChans;
 }
 
@@ -182,16 +181,20 @@ int synthesis_fifo_t::write(const double* buf) {
 
     if (valid > 0) {
         for (int w = 0; w < _numChans; ++w) {
-            double* pbufchan = _buf.get() + _writeIdx + w * _bufLen;
-            std::copy(pbufchan, pbufchan + valid,
-                      _buf.get() + w * _writechanstride);
+            double*       pbufchan = _buf.get() + _writeIdx + w * _bufLen;
+            const double* bufchan = buf + w * _writechanstride;
+            for (int ii = 0; ii < valid; ++ii) {
+                pbufchan[ii] += bufchan[ii];
+            }
         }
     }
     if (over > 0) {
         for (int w = 0; w < _numChans; ++w) {
-            double* pbufchan = _buf.get() + w * _bufLen;
-            std::copy(pbufchan, pbufchan + over,
-                      _buf.get() + valid + w * _writechanstride);
+            double*       pbufchan = _buf.get() + w * _bufLen;
+            const double* bufchan = buf + valid + w * _writechanstride;
+            for (int ii = 0; ii < over; ++ii) {
+                pbufchan[ii] += bufchan[ii];
+            }
         }
     }
 
@@ -227,7 +230,7 @@ int synthesis_fifo_t::read(int bufLen, int W, double** buf) {
     // are not used in write again
     if (valid > 0) {
         for (int w = 0; w < W; ++w) {
-            double* pbufchan = _buf.get() + _readIdx + w * _bufLen; 
+            double* pbufchan = _buf.get() + _readIdx + w * _bufLen;
             std::copy(pbufchan, pbufchan + valid, buf[w]);
             std::fill(pbufchan, pbufchan + valid, 0);
         }

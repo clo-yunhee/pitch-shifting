@@ -17,6 +17,8 @@ class pv_t final {
 
     ~pv_t();
 
+    int get_procdelay() const;
+
     void print_pos() const;
 
     size_t next_inlen(size_t Lout) const;
